@@ -1,10 +1,22 @@
 import React from 'react';
-import {Text} from 'ink';
+import {Text, useInput} from 'ink';
+import { Layout } from "./layout.js";
 
-export default function App({name = 'Stranger'}) {
+const App = () => {
+
+
+	const handleUserInput = (input, key) => {
+		if (key ===) {
+
+		}
+	};
+
+	useInput(handleUserInput);
+
+
 	return (
-		<Text>
-			Hello, <Text color="green">{name}</Text>
-		</Text>
+		<Layout />
 	);
-}
+} 
+
+export default App;

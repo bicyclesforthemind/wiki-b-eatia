@@ -11,7 +11,7 @@
 		"build": "babel --out-dir=dist source",
 		"dev": "babel --out-dir=dist --watch source",
 		"test": "prettier --check . && xo && ava",
-		"start": "npm run build && node dist/cli.js"
+		"start": "babel --out-dir=dist source && node dist/cli.js"
 	},
 	"files": [
 		"dist"
