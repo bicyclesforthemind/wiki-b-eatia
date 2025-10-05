@@ -1,24 +1,25 @@
-import React, { useEffect, useState, useLayoutEffect } from 'react';
-import {Text, useApp, useInput, useStdout} from 'ink';
-import { TitleScreen } from './titleScreen.js';
-import { Loading } from './loading.js';
-import { Game } from "./game.js";
+import React, { useState, useLayoutEffect, useCallback } from 'react';
+import { useApp, useInput, useStdout} from 'ink';
+import { TitleScreen } from './components/titleScreen.js';
+import { Loading } from './components/loading.js';
+import { GameStart } from "./components/gameStart.js";
+import { GameOver } from './components/gameOver.js';
 
-const ENTER_FULL_SCREEN_STR = "\x1b[?1049h";
-const EXIT_FULL_SCREEN_STR = "\x1b[?1049l";
+import { ENTER_FULL_SCREEN_STR, EXIT_FULL_SCREEN_STR, INITIAL_GAME_SCORE, GAME_CLOCK_DURATION } from "./consts.js";
 
 const APP_LIFECYCLE = {
 	APP_LOADING: "APP_LOADING",
 	APP_STARTED: "APP_STARTED",
 	GAME_STARTED: "GAME_STARTED",
-	GAME_ENDED: "GAME_ENDED",
+	GAME_OVER: "GAME_OVER",
 }
 
 const App = () => {
 
-	const [hasAppStarted, setHasAppStarted] = useState(false);
-
 	const [appLifecycle, setAppLifecycle] = useState(APP_LIFECYCLE.APP_LOADING);
+
+	const [gameScore, setGameScore] = useState(INITIAL_GAME_SCORE);
+	const [timeLeft, setTimeLeft] = useState(GAME_CLOCK_DURATION);
 
 	const { exit } = useApp();
 	const { stdout } = useStdout();
@@ -34,23 +35,28 @@ const App = () => {
 
 	useLayoutEffect(() => {
 		stdout.write(ENTER_FULL_SCREEN_STR);
-		
-		const timer = setTimeout(() => {
-			setAppLifecycle(APP_LIFECYCLE.APP_STARTED);
-		}, 300);
-
-		return () => clearTimeout(timer);
-		
 	}, []);
+
+	const resetGame = () => {
+		setGameScore(INITIAL_GAME_SCORE); 
+		setTimeLeft(GAME_CLOCK_DURATION);
+	};
 	
 
 	switch (appLifecycle) {
 		case APP_LIFECYCLE.APP_LOADING:
-			return <Loading />;
+			return <Loading handleLoadingFinished={() => setAppLifecycle(APP_LIFECYCLE.APP_STARTED)} />;
 		case APP_LIFECYCLE.APP_STARTED:
 			return <TitleScreen handleModeSelected={() => setAppLifecycle(APP_LIFECYCLE.GAME_STARTED)} />;
 		case APP_LIFECYCLE.GAME_STARTED:
-			return <Game />
+			return <GameStart 
+				score={gameScore} 
+				timeLeft={timeLeft} 
+				handleScoreChange={() => setGameScore(score + 1)} 
+				handleTimeChange={() => setTimeLeft(timeLeft - 1)} 
+				handleGameOver={() => setAppLifecycle(APP_LIFECYCLE.GAME_OVER)} />
+		case APP_LIFECYCLE.GAME_OVER:
+			return <GameOver handleResetGameOver={() => {setAppLifecycle(APP_LIFECYCLE.APP_LOADING); resetGame();}} />
 		default:
 			return null;
 	}
