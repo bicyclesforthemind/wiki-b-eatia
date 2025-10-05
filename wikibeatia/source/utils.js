@@ -19,12 +19,12 @@ export async function fetchArticle(article) {
 	params.append("rvprop", "ids|timestamp");
 	params.append("explaintext", 1);
 	params.append("inprop", "url");
-	const response = await fetch(`${WIKI_URL}?${params}`);
+	const response = await getFetch(`${WIKI_URL}?${params}`);
 
 	return articles;
 }
 
-export async function fetchRandom() {
+export async function fetchRandom(limit = 10) {
 	const params = new URLSearchParams();
 
 	params.append("action", "query");
@@ -32,23 +32,30 @@ export async function fetchRandom() {
 	params.append("list", "random");
 	params.append("formatversion", "2");
 	params.append("rnnamespace", "0");
-	params.append("rnlimit", "10");
+	params.append("rnlimit", limit);
 	const response = await getFetch(params);
 	return response.query.random;
 }
 
-export async function fetchMeta(pageIds) {
-	const params = new URLSearchParams();
-	params.append("action", "query");
-	params.append("format", "json");
-  params.append("prop", "info|pageprops");
-  params.append("pageids", pageIds.join("|"));
-  params.append("rvprop", "ids|timestamp|content");
-	params.append("rvslots", "main");
-  params.append("inprop", "url");
+const MAX_IDS = 50;
 
-	const response = await getFetch(params);
-	return Object.values(response.query.pages).map(({length, title}) => ({length, title}));
+export async function fetchMeta(pageIds) {
+	const results = [];
+	for (let i = 0; i < pageIds.length; i+= MAX_IDS ) {
+		const start = i;
+		const end = i + Math.min(MAX_IDS, pageIds.length - start);
+
+		const params = new URLSearchParams();
+		params.append("action", "query");
+		params.append("format", "json");
+		params.append("prop", "info");
+		params.append("pageids", pageIds.slice(start, end).join("|"));
+		params.append("inprop", "url");
+
+		const response = await getFetch(params);
+		results.push(Object.values(response.query.pages));
+	}
+	return results.flat();
 }
 
 export async function fetchFoodCategories() {
