@@ -47,7 +47,7 @@ const App = () => {
 		case APP_LIFECYCLE.APP_LOADING:
 			return <Loading handleLoadingFinished={() => setAppLifecycle(APP_LIFECYCLE.APP_STARTED)} />;
 		case APP_LIFECYCLE.APP_STARTED:
-			return <TitleScreen handleModeSelected={() => setAppLifecycle(APP_LIFECYCLE.GAME_STARTED)} />;
+			return <TitleScreen handleModeSelected={() => {stdout.write(ENTER_FULL_SCREEN_STR); setAppLifecycle(APP_LIFECYCLE.GAME_STARTED)}} />;
 		case APP_LIFECYCLE.GAME_STARTED:
 			return <GameStart 
 				score={gameScore} 
