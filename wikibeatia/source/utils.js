@@ -3,7 +3,9 @@ const CATEGORY = 'foods';
 const WIKI_URL = 'https://en.wikipedia.org/w/api.php'
 
 async function getFetch(params) {
-	const response = await fetch(`${WIKI_URL}?${params}`, {
+	const url = `${WIKI_URL}?${params}`;
+
+	const response = await fetch(url, {
 		headers: {
 			'User-Agent': 'Wiki-b-eatia/0.1 (hi@gorman.zone) node/24.9.0',
 		}
@@ -31,9 +33,11 @@ export async function fetchRandom(limit = 10) {
 	params.append("format", "json");
 	params.append("list", "random");
 	params.append("formatversion", "2");
+	params.append("prop", "info");
 	params.append("rnnamespace", "0");
-	params.append("rnlimit", limit);
+	params.append("rnlimit", `${limit}`);
 	const response = await getFetch(params);
+	
 	return response.query.random;
 }
 

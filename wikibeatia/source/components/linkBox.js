@@ -1,31 +1,67 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
 import { Box, Newline, useInput } from "ink";
 
 import { Link } from "./link.js";
 
-export const LinkBox = () => {
+import { fetchRandom } from "../utils.js";
 
-  // get links
-  // display link
+import { WIKIPEDIA_ARTICLE_FETCH_LIMIT, KEY_SORT_ORDER } from "../consts.js";
+
+export const LinkBox = ({ handleScoreChange }) => {
+
+  const [fetchedData, setFetchedData] = useState();
+  const [articles, setArticles] = useState();
+  const [articlesToShow, setArticlesToShow] = useState([]);
   
+  useEffect(() => {
+    const f = async () => {
+      const data = await fetchRandom(WIKIPEDIA_ARTICLE_FETCH_LIMIT);
 
-  const MOCK_LINKS = [
-    { keyboardKey: "a", title: "TitleTitleTitleTitle" },
-    { keyboardKey: "s", title: "TitleTitleTitleTitle" },
-    { keyboardKey: "d", title: "TitleTitleTitleTitle" },
-    { keyboardKey: "f", title: "TitleTitleTitleTitle" },
-    { keyboardKey: "g", title: "TitleTitleTitleTitle" },
-  ];
+     setFetchedData(data);
+    };
 
+    f();
+  }, []);
 
-  const [articlesToShow, setArticlesToShow] = useState(MOCK_LINKS); 
-  
+  useEffect(() => {
+    if (fetchedData) {
+      const [first, second, third, fourth, fifth, ...rest] = fetchedData
+
+      setArticles(rest);
+
+      setArticlesToShow([
+        {keyboardKey: "a", title: first.title},
+        {keyboardKey: "s", title: second.title},
+        {keyboardKey: "d", title: third.title},
+        {keyboardKey: "f", title: fourth.title},
+        {keyboardKey: "g", title: fifth.title},
+     ]);
+    }
+  }, [fetchedData]);
+
+  const sortByKeyboardKeys = (a, b) => KEY_SORT_ORDER.indexOf(a.keyboardKey) - KEY_SORT_ORDER.indexOf(b.keyboardKey);
 
   const handleKeyPress = useCallback((keyboardKey) => {
-    //
-    
-  }, [articlesToShow]);
+    const [first, ...rest] = articles;
+
+    const includedArticles = articlesToShow.filter((article) => article.keyboardKey !== keyboardKey); 
+
+    handleScoreChange(Math.floor(Math.random() * 7));
+
+    const nextArticleToShow = {
+      keyboardKey,
+      title: first.title,
+    };
+
+    setArticles([...rest]);
+
+    setArticlesToShow([
+      nextArticleToShow,
+      ...includedArticles,
+    ].toSorted(sortByKeyboardKeys));
+
+  }, [articles, articlesToShow]);
 
   useInput((input, _) => {
     switch (input) {
@@ -53,7 +89,7 @@ export const LinkBox = () => {
   return (
     <Box flexDirection="column" alignItems="center" flexGrow={"50%"} borderStyle="double" borderColor="greenBright">
       <Box flexDirection="row" flexGrow={1} paddingX={4} columnGap={4}>
-        {MOCK_LINKS.map(({keyboardKey, title}) => (<Link key={`${keyboardKey}_${title}`} keyboardKey={keyboardKey} title={title}  />))}
+        {articlesToShow.map(({keyboardKey, title}) => (<Link key={`${keyboardKey}_${title}`} keyboardKey={keyboardKey} title={title}  />))}
       </Box>
       {/* Pad newlines */}
       <Newline />

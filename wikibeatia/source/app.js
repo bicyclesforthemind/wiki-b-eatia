@@ -5,7 +5,13 @@ import { Loading } from './components/loading.js';
 import { GameStart } from "./components/gameStart.js";
 import { GameOver } from './components/gameOver.js';
 
-import { ENTER_FULL_SCREEN_STR, EXIT_FULL_SCREEN_STR, INITIAL_GAME_SCORE, GAME_CLOCK_DURATION } from "./consts.js";
+import { exec } from "node:child_process";
+import { readdir } from "node:fs/promises";
+
+import path from "node:path";
+import { cwd } from "node:process";
+
+import { ENTER_FULL_SCREEN_STR, EXIT_FULL_SCREEN_STR, INITIAL_GAME_SCORE, GAME_CLOCK_DURATION, SOUND_FILE_NAME } from "./consts.js";
 
 const APP_LIFECYCLE = {
 	APP_LOADING: "APP_LOADING",
@@ -24,6 +30,8 @@ const App = () => {
 	const { exit } = useApp();
 	const { stdout } = useStdout();
 
+	const [runningProcess, setRunningProcess] = useState();
+
 	const handleUserInput = (input, key) => {
 		if (key.escape) {
 			stdout.write(EXIT_FULL_SCREEN_STR);
@@ -37,11 +45,33 @@ const App = () => {
 		stdout.write(ENTER_FULL_SCREEN_STR);
 	}, []);
 
-	const resetGame = () => {
+	const handleStartAudio = () => {
+
+		const playAudioFile = async () => {
+			const filePath = path.join(cwd(), "sounds");
+			
+			const files = await readdir(filePath);
+
+			if (files && files.length > 0) {
+				const playerProcess = exec(`afplay -t ${GAME_CLOCK_DURATION} "${path.join(filePath, SOUND_FILE_NAME)}"`);
+				setRunningProcess(playerProcess);
+			}
+		};
+
+		playAudioFile();
+	};
+
+	const resetGame = useCallback(() => {
 		setGameScore(INITIAL_GAME_SCORE); 
 		setTimeLeft(GAME_CLOCK_DURATION);
-	};
+
+		if (runningProcess) {
+			runningProcess.kill();
+		}
+	}, [setGameScore, setTimeLeft, runningProcess]);
 	
+
+	const handleScoreChange = (points) => setGameScore(gameScore + points);
 
 	switch (appLifecycle) {
 		case APP_LIFECYCLE.APP_LOADING:
@@ -52,7 +82,8 @@ const App = () => {
 			return <GameStart 
 				score={gameScore} 
 				timeLeft={timeLeft} 
-				handleScoreChange={() => setGameScore(score + 1)} 
+				handleStartAudio={handleStartAudio}
+				handleScoreChange={handleScoreChange} 
 				handleTimeChange={() => setTimeLeft(timeLeft - 1)} 
 				handleGameOver={() => setAppLifecycle(APP_LIFECYCLE.GAME_OVER)} />
 		case APP_LIFECYCLE.GAME_OVER:
