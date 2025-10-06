@@ -1,5 +1,4 @@
-import React, { useEffect } from "react";
-import { useState } from "react";
+import React, { useEffect, useMemo } from "react";
 import { Box } from "ink";
 
 import { Stomach } from "./stomach.js";
@@ -9,12 +8,10 @@ import { Score } from "./score.js";
 
 import { LinkBox } from "./linkBox.js";
 
-import { GAME_CLOCK_TICK_DURATION } from "../consts.js";
-
-import { Player } from 'cli-sound';
+import { GAME_CLOCK_TICK_DURATION, STOMACH_GRID_MAX_FILL, STOMACH_GRID_COLUMNS } from "../consts.js";
 
 
-export const GameStart = ({ score, timeLeft, handleScoreChange, handleTimeChange,  handleGameOver }) => {
+export const GameStart = ({ score, timeLeft, handleStartAudio, handleScoreChange, handleTimeChange,  handleGameOver }) => {
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -33,15 +30,23 @@ export const GameStart = ({ score, timeLeft, handleScoreChange, handleTimeChange
     }
   }, [timeLeft, handleGameOver]);
 
+  const fillMeter = useMemo(() => score < (STOMACH_GRID_MAX_FILL * STOMACH_GRID_COLUMNS) ? Math.floor(score / STOMACH_GRID_COLUMNS) : STOMACH_GRID_MAX_FILL, [score]);
+
+
+  // sound player...
+  useEffect(() => {
+    handleStartAudio();
+  }, []);
+
   return (
       <>
         <Box flexDirection="row" height={18} borderStyle="double" borderColor="magentaBright" rowGap={8}>
           <Score score={score} />
-          <Stomach percentageFull={0} />
-          <Monster />
+          <Stomach fillMeter={fillMeter}  />
+          {/* <Monster /> */}
           <Time timeLeft={timeLeft} />
         </Box>
-        <LinkBox />
+        <LinkBox handleScoreChange={handleScoreChange} />
       </>
   );
 };

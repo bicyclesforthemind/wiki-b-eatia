@@ -22,7 +22,7 @@ export const TitleScreen = ({ handleModeSelected }) => {
       <Box paddingTop={12} flexDirection="row" alignItems="center" justifyContent="center" columnGap={16}>
        <Select 
           options={[
-            {label: "Time Mode", value: "TIME_MODE"},
+            {label: "Random Mode", value: "RANDOM_MODE"},
           ]} 
           onChange={(newValue) => {
             if (selectedMode === newValue) {
