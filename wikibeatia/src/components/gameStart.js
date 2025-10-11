@@ -3,7 +3,6 @@ import { Box } from "ink";
 
 import { Stomach } from "./stomach.js";
 import { Time } from "./time.js";
-import { Monster } from "./monster.js";
 import { Score } from "./score.js";
 
 import { LinkBox } from "./linkBox.js";
@@ -43,7 +42,6 @@ export const GameStart = ({ score, timeLeft, handleStartAudio, handleScoreChange
         <Box flexDirection="row" height={18} borderStyle="double" borderColor="magentaBright" rowGap={8}>
           <Score score={score} />
           <Stomach fillMeter={fillMeter}  />
-          {/* <Monster /> */}
           <Time timeLeft={timeLeft} />
         </Box>
         <LinkBox handleScoreChange={handleScoreChange} />
