@@ -5,6 +5,8 @@ export const GAME_MODES = ["RANDOM_MODE"];
 
 export const SOUND_FILE_NAME = "sound_one.m4a";
 
+export const DEFAULT_LOADING_TIME = 400;
+
 export const INITIAL_GAME_SCORE = 0;
 export const GAME_CLOCK_DURATION = 99;
 export const GAME_CLOCK_TICK_DURATION = 250;
