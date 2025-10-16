@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import {Spinner} from '@inkjs/ui';
 
 
-export const Loading = ({ handleLoadingFinished }) => {
+export const Loading = ({ label, type = "orangeBluePulse", handleLoadingFinished }) => {
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -12,5 +12,5 @@ export const Loading = ({ handleLoadingFinished }) => {
 		return () => clearTimeout(timer);
   }, []);
 
-  return (<Spinner label='Loading...' type='orangeBluePulse' />);
+  return (<Spinner label={label} type={type} />);
 }

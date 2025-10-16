@@ -16,6 +16,7 @@ import { ENTER_FULL_SCREEN_STR, EXIT_FULL_SCREEN_STR, INITIAL_GAME_SCORE, GAME_C
 const APP_LIFECYCLE = {
 	APP_LOADING: "APP_LOADING",
 	APP_STARTED: "APP_STARTED",
+	GAME_LOADING: "GAME_LOADING",
 	GAME_STARTED: "GAME_STARTED",
 	GAME_OVER: "GAME_OVER",
 }
@@ -75,9 +76,11 @@ const App = () => {
 
 	switch (appLifecycle) {
 		case APP_LIFECYCLE.APP_LOADING:
-			return <Loading handleLoadingFinished={() => setAppLifecycle(APP_LIFECYCLE.APP_STARTED)} />;
+			return <Loading label={"Loading Terminal..."} handleLoadingFinished={() => setAppLifecycle(APP_LIFECYCLE.APP_STARTED)} />;
 		case APP_LIFECYCLE.APP_STARTED:
-			return <TitleScreen handleModeSelected={() => {stdout.write(ENTER_FULL_SCREEN_STR); setAppLifecycle(APP_LIFECYCLE.GAME_STARTED)}} />;
+			return <TitleScreen handleModeSelected={() => {stdout.write(ENTER_FULL_SCREEN_STR); setAppLifecycle(APP_LIFECYCLE.GAME_LOADING)}} />;
+		case APP_LIFECYCLE.GAME_LOADING: 
+			return <Loading label={"Loading Game..."} handleLoadingFinished={() => setAppLifecycle(APP_LIFECYCLE.GAME_STARTED)} />;
 		case APP_LIFECYCLE.GAME_STARTED:
 			return <GameStart 
 				score={gameScore} 
