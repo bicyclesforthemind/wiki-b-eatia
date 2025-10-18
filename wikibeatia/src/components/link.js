@@ -13,7 +13,7 @@ export const Link = ({ keyboardKey, title }) => {
       case "d":
         return "#FF5F1F";
       case "f":
-        return "#AAF0D1";
+        return "#006400";
       case "g":
         return "#F000FF";
       default: 
