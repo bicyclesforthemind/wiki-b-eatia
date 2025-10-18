@@ -40,7 +40,6 @@ const App = () => {
 			if (runningProcess) {
 				runningProcess.kill();
 			}
-			
 			exit();
 		}
 	};
@@ -52,7 +51,6 @@ const App = () => {
 	}, []);
 
 	const handleStartAudio = () => {
-
 		const playAudioFile = async () => {
 			const filePath = path.join(cwd(), "sounds");
 			
