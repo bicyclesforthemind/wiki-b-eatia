@@ -36,6 +36,11 @@ const App = () => {
 	const handleUserInput = (input, key) => {
 		if (key.escape) {
 			stdout.write(EXIT_FULL_SCREEN_STR);
+			
+			if (runningProcess) {
+				runningProcess.kill();
+			}
+			
 			exit();
 		}
 	};
